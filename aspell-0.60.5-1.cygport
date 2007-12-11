@@ -1,0 +1,42 @@
+DESCRIPTION="GNU spell checker"
+HOMEPAGE="http://aspell.net/"
+SRC_URI="mirror://gnu/${PN}/${P}.tar.gz"
+SRC_PATCH="
+	mirror://portage/app-text/${PN}/files/${PN}-0.60.3-templateinstantiations.patch
+"
+
+# this is the default for 0.60
+# 0.5x used /usr/lib/aspell, but dicts need to be recompiled anyway
+pkglibdir=/usr/lib/aspell-0.60
+
+abi=15
+PKG_NAMES="${PN} lib${PN}${abi} lib${PN}-devel"
+PKG_HINTS="bin lib devel"
+PKG_CONTENTS[0]='--exclude=*.dll etc/ usr/bin/ usr/share/'
+PKG_CONTENTS[1]="usr/bin/*-${abi}.dll ${pkglibdir#/}/"
+PKG_CONTENTS[2]="usr/include/ usr/lib/lib*"
+
+src_compile() {
+	cd ${S}
+	lndirs
+	AUTOPOINT=true cygautoreconf
+
+	cd ${B}
+	cygconf \
+		--enable-docdir=/usr/share/doc/${P} \
+		--enable-pkgdatadir=${pkglibdir} \
+		--enable-pkglibdir=${pkglibdir} \
+		--enable-compile-in-filters \
+		--enable-curses=ncurses \
+		--enable-curses-include=/usr/include/ncurses \
+		--disable-static \
+		--disable-wide-curses
+	cygmake
+}
+
+src_install() {
+	cd ${B}
+	cyginstall
+
+	dosym ../${pkglibdir#/usr/}/{i,}spell /usr/bin
+}
