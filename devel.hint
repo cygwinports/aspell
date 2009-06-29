@@ -1,5 +1,5 @@
 category: Text
-requires: cygwin libaspell15 gettext
+requires: libaspell15 gettext
 external-source: aspell
 sdesc: "GNU spell checker (library development)"
 ldesc: "GNU Aspell is a Free and Open Source spell checker designed to
